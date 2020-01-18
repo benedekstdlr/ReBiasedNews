@@ -3,15 +3,14 @@
   "version": "0.0.1",
   "description": "ReBiase your news with a single click!",
   "permissions": ["activeTab", "declarativeContent", "storage"],
-  "options_page": "options.html",
   "page_action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-		"16": "images/logo_16.png",
-		"32": "images/logo_32.png",
-		"48": "images/logo_48.png",
-		"128": "images/logo_128.png"
-    }
+      "default_popup": "popup.html",
+      "default_icon": {
+             "16": "images/logo_16.png",
+             "32": "images/logo_32.png",
+             "48": "images/logo_48.png",
+             "128": "images/logo_128.png"
+      }
   },
   "icons": {
     "16": "images/logo_16.png",
@@ -19,19 +18,9 @@
     "48": "images/logo_48.png",
     "128": "images/logo_128.png"
   },
-  "manifest_version": 2,
-  "content_scripts": [
-    {
-      "matches": ["*://*.breitbart.com/politics/*/*/*/*"],
-      "run_at": "document_idle",
-      "all_frames": true,
-      "js": ["breitbart.js"]
-    },
-    {
-      "matches": ["*://*.cnn.com/*/*/*/politics/*"],
-      "run_at": "document_idle",
-      "all_frames": true,
-      "js": ["cnn.js"]
-    }
-  ]
+  "background": {
+      "scripts": ["background.js"],
+      "persistent": false
+  },
+  "manifest_version": 2
 }

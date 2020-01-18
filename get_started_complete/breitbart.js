@@ -1,8 +1,4 @@
 'use strict';
-window.onload = function() {
-    console.log("BREITBART");
-    //window.alert("Breitbart!!!");
-
     var title = document.getElementsByTagName("h1")[0];
     title.innerHTML = "Hello World!";
 
@@ -21,4 +17,3 @@ window.onload = function() {
     var generatedText = "REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE";
     document.getElementsByClassName("entry-content")[0].innerHTML = '<p class="subheading">'+descText+"<\p>"+"<p>"+generatedText+"<\p>";
     
-};
