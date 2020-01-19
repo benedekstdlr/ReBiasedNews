@@ -85,8 +85,8 @@ class MyHandler(BaseHTTPRequestHandler):
         origin = self.headers.get('origin')
         hash = hashlib.md5(referer.encode('utf-8')).hexdigest()
         try:
-            print('Accessing from cache')
             f = open('../../out/'+hash, 'rb')
+            print('Accessing from cache')
             text = f.read()
             f.close()
         except IOError:
