@@ -40,8 +40,19 @@ class GeneratorThread(threading.Thread):
             self.sess = gpt2.reset_session(self.sess, threads=7)
             gpt2.load_gpt2(self.sess, checkpoint_dir=dir)
             self.last_model = dir
-        prompt = vals['title'] + ' <START> ' + vals['body']
+        if self.last_model == BB_DIR:
+            prompt = vals['title'] + ' - Breitbart <START> ' + vals['body']
+        else:
+            if vals['body'][:6] == ' (CNN)':
+                vals['body'] = vals['body'][6:]
+            if vals['body'][:5] == '(CNN)':
+                vals['body'] = vals['body'][5:]
+            prompt = vals['title'] + ' <START> ' + vals['body']
+
         text = gpt2.generate(self.sess, checkpoint_dir=self.last_model, return_as_list=True, prefix=prompt)[0]
+        if self.last_model == BB_DIR:
+            text = text.replace('[', '</p> <p class="zn-body__paragraph">')
+        text = text[len(prompt):]
         text = str.encode(text)
         return text
 
