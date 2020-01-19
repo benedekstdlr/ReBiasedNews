@@ -16,6 +16,9 @@ console.log("DESC: "+desc);
 var request = new XMLHttpRequest();
 
 request.open('POST', 'https://rebiasednews.ddns.net', true);
+request.onerror = function() {
+    window.alert("Sorry, this article is not ready yet, try again in a few minutes");
+}
 request.onload = function() {
     if(this.response === undefined || this.response.length == 0) {
         // TODO: nothing found
@@ -24,7 +27,7 @@ request.onload = function() {
     } else {
         var resp = this.response;
         console.log(resp);
-        document.getElementsByClassName("entry-content")[0].innerHTML = '<p class="subheading">'+descText+'<\p>'+'<p calss="entry-content">'+resp+'<\p>';
+        document.getElementsByClassName("entry-content")[0].innerHTML = "<p>"+resp+"<\p>";
     }
 };
 request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
