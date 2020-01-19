@@ -16,19 +16,32 @@ class MyHandler(BaseHTTPRequestHandler):
         vals = json.loads(body)
         prompt = vals['title'] + ' <START> ' + vals['body']
         text = gpt2.generate(sess, checkpoint_dir=CP_DIR, return_as_list=True, prefix=prompt)[0]
+        text="a"
         text = str.encode(text)
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.send_header("Content-length", len(text))
+        self.send_header('Access-Control-Allow-Origin', 'https://www.breitbart.com')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
         self.wfile.write(text)
 
-PORT = 80
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', 'https://www.breitbart.com')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
 
-Handler = MyHandler
 
-httpd = TCPServer(("", PORT), Handler)
+PORT = 443
+
+httpd = TCPServer(("", PORT), MyHandler)
 
 print("serving at port", PORT)
-httpd.socket = ssl.wrap_socket (httpd.socket, certfile='./server.pem', server_side=True)
+httpd.socket = ssl.wrap_socket (httpd.socket, certfile='/etc/letsencrypt/live/rebiasednews.ddns.net/fullchain.pem',
+        keyfile='/etc/letsencrypt/live/rebiasednews.ddns.net/privkey.pem', server_side=True)
 httpd.serve_forever()
