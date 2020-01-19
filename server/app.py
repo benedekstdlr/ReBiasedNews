@@ -52,11 +52,11 @@ class GeneratorThread(threading.Thread):
                 print('Getting \"' + str(vals['title']) + '\" with hash ' + hash
                               + ' : ' + str(q.qsize()) + ' items in queue')
                 out_path = '../../out/'+hash
-                if not os.path.exist(out_path)
-                text = self.generate_new(origin, vals)
-                f = open(out_path, 'wb')
-                f.write(text)
-                f.close()
+                if not os.path.exist(out_path):
+                    text = self.generate_new(origin, vals)
+                    f = open(out_path, 'wb')
+                    f.write(text)
+                    f.close()
             time.sleep(1)
         return
 
