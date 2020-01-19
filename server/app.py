@@ -89,7 +89,7 @@ class MyHandler(BaseHTTPRequestHandler):
         except IOError:
             print('Generating new')
             q.put((hash, origin, vals))
-            self.send_response(404)
+            self.send_response(500)
             text = b'... And then what? Check back later to find out!'
 
 
