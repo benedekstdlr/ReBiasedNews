@@ -22,7 +22,7 @@ def model_dir(origin):
 
 class MyHandler(BaseHTTPRequestHandler):
     def generate_new(self, origin, vals):
-        return 'stuff ' + random.randrange(10000)
+        return ('stuff ' + str(random.randrange(10000))).encode('utf-8')
         dir = source(origin)
         if dir != last_model:
             sess = gpt2.reset_session(sess, threads=7)
@@ -40,16 +40,19 @@ class MyHandler(BaseHTTPRequestHandler):
         print(body)
         vals = json.loads(body)
         referer = self.headers.get('referer')
-        hash = hashlib.md5(referer.encode('utf-8')).hexdigest()
-        try:
-            f = open('../../out/'+hash, 'r')
-            text = f.read()
-            f.close()
-        except IOError:
-            text = self.generate_new(referer, origin)
-            f = open('../../out/'+hash, 'w')
-            f.write(text)
-            f.close()
+        origin = self.headers.get('origin')
+         hash = hashlib.md5(referer.encode('utf-8')).hexdigest()
+         try:
+             print('Accessing from cache')
+             f = open('../../out/'+hash, 'rb')
+             text = f.read()
+             f.close()
+         except IOError:
+             print('Generating new')
+             text = self.generate_new(origin, vals)
+             f = open('../../out/'+hash, 'wb')
+             f.write(text)
+             f.close()
 
 
         self.send_response(200)
