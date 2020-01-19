@@ -11,7 +11,7 @@ gpt2.load_gpt2(sess, checkpoint_dir=CP_DIR)
 class MyHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         print(self.headers)
-        body = self.rfile.read(int(self.headers.get('content-length')))
+        body = self.rfile.read(int(self.headers.get('content-length'))).decode('utf-8')
         print(body)
         vals = json.loads(body)
         prompt = vals['title'] + ' <START> ' + vals['body']
