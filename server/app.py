@@ -3,21 +3,54 @@ from socketserver import TCPServer
 import gpt_2_simple as gpt2
 import json
 import ssl
+import md5
+import random
 
-CP_DIR = '../../models/breitbart/checkpoint'
+BB_DIR = '../../models/breitbart/checkpoint'
+CNN_DIR = '../../models/cnn/checkpoint'
 
+last_model = None
 sess = gpt2.start_tf_sess()
-gpt2.load_gpt2(sess, checkpoint_dir=CP_DIR)
+
+
+def model_dir(origin):
+    if 'breitbart' in origin:
+        return CNN_DIR
+    else:
+        return BB_DIR
+
 
 class MyHandler(BaseHTTPRequestHandler):
+    def generate_new(self, origin, vals):
+        return 'stuff ' + random.randrange(10000)
+        dir = source(origin)
+        if dir != last_model:
+            sess = gpt2.reset_session(sess, threads=7)
+            gpt2.load_gpt2(sess, checkpoint_dir=dir)
+            last_model = dir
+        prompt = vals['title'] + ' <START> ' + vals['body']
+        text = gpt2.generate(sess, checkpoint_dir=last_model, return_as_list=True, prefix=prompt)[0]
+        text = str.encode(text)
+        return text
+
+
     def do_POST(self):
         print(self.headers)
         body = self.rfile.read(int(self.headers.get('content-length'))).decode('utf-8')
         print(body)
         vals = json.loads(body)
-        prompt = vals['title'] + ' <START> ' + vals['body']
-        text = gpt2.generate(sess, checkpoint_dir=CP_DIR, return_as_list=True, prefix=prompt)[0]
-        text = str.encode(text)
+        referer = self.headers.get('referer')
+        hash = md5.new(referer).hexdigest()
+        try:
+            f = open('../../out/'+hash, 'r')
+            text = f.read()
+        except IOError:
+            text = self.generate_new(referer, origin)
+            f = open('../../out/'+hash, 'w')
+            f.write(text)
+        finally:
+            f.close()
+
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.send_header("Content-length", len(text))
