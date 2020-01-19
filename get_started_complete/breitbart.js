@@ -24,7 +24,7 @@ request.onload = function() {
     } else {
         var resp = this.response;
         console.log(resp);
-        document.getElementsByClassName("entry-content")[0].innerHTML = '<p class="subheading">'+descText+"<\p>"+"<p>"+resp+"<\p>";
+        document.getElementsByClassName("entry-content")[0].innerHTML = '<p class="subheading">'+descText+'<\p>'+'<p calss="entry-content">'+resp+'<\p>';
     }
 };
 request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
