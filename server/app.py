@@ -30,4 +30,5 @@ Handler = MyHandler
 httpd = TCPServer(("", PORT), Handler)
 
 print("serving at port", PORT)
+httpd.socket = ssl.wrap_socket (httpd.socket, certfile='./server.pem', server_side=True)
 httpd.serve_forever()
