@@ -6,8 +6,9 @@ import ssl
 import hashlib
 import random
 import threading
-import Queue
+import queue
 import time
+import os.path
 
 BB_DIR = '../../models/breitbart/checkpoint'
 CNN_DIR = '../../models/cnn/checkpoint'
@@ -15,7 +16,7 @@ CNN_DIR = '../../models/cnn/checkpoint'
 last_model = None
 sess = gpt2.start_tf_sess()
 
-q = Queue.Queue(10000)
+q = queue.Queue(10000)
 
 def model_dir(origin):
     if 'breitbart' in origin:
@@ -33,7 +34,7 @@ class GeneratorThread(threading.Thread):
         return
 
     def generate_new(self, origin, vals):
-        return ('stuff ' + str(random.randrange(10000))).encode('utf-8')
+        #return ('stuff ' + str(random.randrange(10000))).encode('utf-8')
         dir = source(origin)
         if dir != last_model:
             sess = gpt2.reset_session(sess, threads=7)
@@ -47,12 +48,13 @@ class GeneratorThread(threading.Thread):
     def run(self):
         while True:
             if not q.empty():
-                time.sleep(30)
                 (hash, origin, vals) = q.get()
-                print('Getting \"' + str(vals['title']) + '\" with hash ' + hash +
+                print('Getting \"' + str(vals['title']) + '\" with hash ' + hash
                               + ' : ' + str(q.qsize()) + ' items in queue')
+                out_path = '../../out/'+hash
+                if not os.path.exist(out_path)
                 text = self.generate_new(origin, vals)
-                f = open('../../out/'+hash, 'wb')
+                f = open(out_path, 'wb')
                 f.write(text)
                 f.close()
             time.sleep(1)
@@ -94,6 +96,8 @@ class MyHandler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
+GeneratorThread(name='generator-thread').start()
+
 PORT = 443
 httpd = TCPServer(("", PORT), MyHandler)
 
@@ -101,5 +105,3 @@ print("serving at port", PORT)
 httpd.socket = ssl.wrap_socket (httpd.socket, certfile='/etc/letsencrypt/live/rebiasednews.ddns.net/fullchain.pem',
         keyfile='/etc/letsencrypt/live/rebiasednews.ddns.net/privkey.pem', server_side=True)
 httpd.serve_forever()
-
-GeneratorThread(name='generator-thread').start()
