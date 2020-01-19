@@ -38,7 +38,7 @@ class GeneratorThread(threading.Thread):
         dir = model_dir(origin)
         if dir != self.last_model:
             self.sess = gpt2.reset_session(self.sess, threads=7)
-            gpt2.load_gpt2(sess, checkpoint_dir=dir)
+            gpt2.load_gpt2(self.sess, checkpoint_dir=dir)
             self.last_model = dir
         prompt = vals['title'] + ' <START> ' + vals['body']
         text = gpt2.generate(self.sess, checkpoint_dir=self.last_model, return_as_list=True, prefix=prompt)[0]
