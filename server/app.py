@@ -41,7 +41,7 @@ class GeneratorThread(threading.Thread):
             gpt2.load_gpt2(self.sess, checkpoint_dir=dir)
             self.last_model = dir
         if self.last_model == BB_DIR:
-            prompt = vals['title'] + ' - Breitbart <START> ' + vals['body']
+            prompt = '<|startoftext|> '+ vals['title'] + ' - Breitbart <START> ' + vals['body']
         else:
             if vals['body'][:6] == ' (CNN)':
                 vals['body'] = vals['body'][6:]
@@ -49,10 +49,10 @@ class GeneratorThread(threading.Thread):
                 vals['body'] = vals['body'][5:]
             prompt = vals['title'] + ' <START> ' + vals['body']
 
-        text = gpt2.generate(self.sess, checkpoint_dir=self.last_model, return_as_list=True, prefix=prompt)[0]
+        text = gpt2.generate(self.sess, checkpoint_dir=self.last_model, return_as_list=True, prefix=prompt,
+            include_prefix=False, truncate='<|endoftext|>')[0]
         if self.last_model == BB_DIR:
             text = text.replace('[', '</p> <p class="zn-body__paragraph">')
-        text = text[len(prompt):]
         text = str.encode(text)
         return text
 
@@ -89,13 +89,14 @@ class MyHandler(BaseHTTPRequestHandler):
             print('Accessing from cache')
             text = f.read()
             f.close()
+            self.send_response(200)
         except IOError:
             print('Generating new')
             q.put((hash, origin, vals))
+            self.send_response(418)
             text = b'... And then what? Check back later to find out!'
 
 
-        self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.send_header("Content-length", len(text))
         self.send_header('Access-Control-Allow-Origin', '*')
