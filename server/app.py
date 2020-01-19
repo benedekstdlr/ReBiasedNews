@@ -10,7 +10,7 @@ gpt2.load_gpt2(sess, checkpoint_dir=CP_DIR)
 class MyHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         print(self.headers)
-        print(self.rfile.read(self.headers.get('content-length')))
+        print(self.rfile.read(int(self.headers.get('content-length'))))
         #text = gpt2.generate(sess, checkpoint_dir=CP_DIR, return_as_list=True, prefix=rfile.read())[0]
         text = ''
         text = str.encode(text)
