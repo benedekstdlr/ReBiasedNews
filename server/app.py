@@ -3,7 +3,7 @@ from socketserver import TCPServer
 import gpt_2_simple as gpt2
 import json
 import ssl
-import md5
+import hashlib
 import random
 
 BB_DIR = '../../models/breitbart/checkpoint'
@@ -40,16 +40,17 @@ class MyHandler(BaseHTTPRequestHandler):
         print(body)
         vals = json.loads(body)
         referer = self.headers.get('referer')
-        hash = md5.new(referer).hexdigest()
+        hash = hashlib.md5(referer.encode('utf-8')).hexdigest()
         try:
             f = open('../../out/'+hash, 'r')
             text = f.read()
+            f.close()
         except IOError:
             text = self.generate_new(referer, origin)
             f = open('../../out/'+hash, 'w')
             f.write(text)
-        finally:
             f.close()
+
 
         self.send_response(200)
         self.send_header("Content-type", "text/html")
