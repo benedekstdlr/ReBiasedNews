@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler
 from socketserver import TCPServer
 import gpt_2_simple as gpt2
 import json
+import ssl
 
 CP_DIR = '../../models/breitbart/checkpoint'
 
@@ -16,24 +17,17 @@ class MyHandler(BaseHTTPRequestHandler):
         vals = json.loads(body)
         prompt = vals['title'] + ' <START> ' + vals['body']
         text = gpt2.generate(sess, checkpoint_dir=CP_DIR, return_as_list=True, prefix=prompt)[0]
-        text="a"
         text = str.encode(text)
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.send_header("Content-length", len(text))
-        self.send_header('Access-Control-Allow-Origin', 'https://www.breitbart.com')
-        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         self.wfile.write(text)
 
     def do_OPTIONS(self):
         self.send_response(200, "ok")
-        self.send_header('Access-Control-Allow-Origin', 'https://www.breitbart.com')
-        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
-        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
 
