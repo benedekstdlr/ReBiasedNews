@@ -35,7 +35,7 @@ class GeneratorThread(threading.Thread):
 
     def generate_new(self, origin, vals):
         #return ('stuff ' + str(random.randrange(10000))).encode('utf-8')
-        dir = source(origin)
+        dir = model_dir(origin)
         if dir != last_model:
             sess = gpt2.reset_session(sess, threads=7)
             gpt2.load_gpt2(sess, checkpoint_dir=dir)
