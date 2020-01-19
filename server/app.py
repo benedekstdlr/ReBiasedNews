@@ -13,8 +13,6 @@ import os.path
 BB_DIR = '../../models/breitbart/checkpoint'
 CNN_DIR = '../../models/cnn/checkpoint'
 
-last_model = ''
-sess = gpt2.start_tf_sess()
 
 q = queue.Queue(10000)
 
@@ -31,17 +29,19 @@ class GeneratorThread(threading.Thread):
         super(GeneratorThread,self).__init__()
         self.target = target
         self.name = name
+        self.last_model = ''
+        self.sess = gpt2.start_tf_sess()
         return
 
     def generate_new(self, origin, vals):
         #return ('stuff ' + str(random.randrange(10000))).encode('utf-8')
         dir = model_dir(origin)
-        if dir != last_model:
-            sess = gpt2.reset_session(sess, threads=7)
+        if dir != self.last_model:
+            self.sess = gpt2.reset_session(self.sess, threads=7)
             gpt2.load_gpt2(sess, checkpoint_dir=dir)
-            last_model = dir
+            self.last_model = dir
         prompt = vals['title'] + ' <START> ' + vals['body']
-        text = gpt2.generate(sess, checkpoint_dir=last_model, return_as_list=True, prefix=prompt)[0]
+        text = gpt2.generate(self.sess, checkpoint_dir=self.last_model, return_as_list=True, prefix=prompt)[0]
         text = str.encode(text)
         return text
 
