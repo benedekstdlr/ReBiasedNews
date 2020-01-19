@@ -2,13 +2,33 @@
 <html>
   <head>
     <style>
-      button {
-        outline: none;
-      }
+        .btn:hover,
+        .btn:focus {
+          color: #ffffff;
+          border-color: currentColor;
+          background-color: #0000cc;
+        }
+        
+        .btn {
+          display: inline-block;
+          text-align: center;
+          text-decoration: none;
+
+          margin: 2px 0;
+          
+          border: solid 1px transparent;
+          border-radius: 4px;
+
+          padding: 0.5em 1em;
+
+          color: #ffffff;
+          background-color: #e60000;
+          outline: none;
+        }
     </style>
   </head>
   <body>
-    <button id="change"> ReBiase this article!</button>
+    <button id="change" class="btn"> ReBiase this article!</button>
     <script src="popup.js"></script>
   </body>
 </html>
