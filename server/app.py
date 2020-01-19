@@ -13,7 +13,7 @@ import os.path
 BB_DIR = '../../models/breitbart/checkpoint'
 CNN_DIR = '../../models/cnn/checkpoint'
 
-last_model = None
+last_model = ''
 sess = gpt2.start_tf_sess()
 
 q = queue.Queue(10000)
